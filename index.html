@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HTB Beginner Roadmap | Pentest & SOC Analyst</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #070710;
+      --pt-accent: #ff4500;
+      --pt-glow: rgba(255,69,0,0.3);
+      --pt-border: rgba(255,69,0,0.4);
+      --pt-tag: rgba(255,69,0,0.15);
+      --soc-accent: #00d4ff;
+      --soc-glow: rgba(0,212,255,0.3);
+      --soc-border: rgba(0,212,255,0.4);
+      --soc-tag: rgba(0,212,255,0.12);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse at 20% 0%, rgba(255,69,0,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 0%, rgba(0,180,255,0.06) 0%, transparent 60%),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.012) 2px, rgba(255,255,255,0.012) 4px);
+      font-family: 'Share Tech Mono', monospace;
+      color: #f0f0f0;
+      min-height: 100vh;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #0a0a14; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100vh); }
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .scanline {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: rgba(255,255,255,0.03);
+      animation: scanline 8s linear infinite;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .header {
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      padding: 28px 24px 20px;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .header-inner { max-width: 720px; margin: 0 auto; }
+
+    .header-tag {
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 6px;
+    }
+
+    .header-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: #fff;
+      margin-bottom: 20px;
+      transition: text-shadow 0.3s ease;
+    }
+
+    .header-title.pentest { text-shadow: 0 0 30px var(--pt-glow); }
+    .header-title.soc { text-shadow: 0 0 30px var(--soc-glow); }
+
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 22px;
+      vertical-align: middle;
+      margin-left: 4px;
+      animation: blink 1s step-end infinite;
+    }
+    .cursor.pentest { background: var(--pt-accent); }
+    .cursor.soc { background: var(--soc-accent); }
+
+    .track-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .track-btn {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      padding: 9px 18px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: rgba(255,255,255,0.03);
+      color: rgba(255,255,255,0.5);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .track-btn:hover { opacity: 1; transform: translateY(-1px); }
+    .track-btn.active-pentest {
+      border-color: var(--pt-accent);
+      background: var(--pt-tag);
+      color: var(--pt-accent);
+      box-shadow: 0 0 12px rgba(255,69,0,0.3);
+    }
+    .track-btn.active-soc {
+      border-color: var(--soc-accent);
+      background: var(--soc-tag);
+      color: var(--soc-accent);
+      box-shadow: 0 0 12px rgba(0,212,255,0.3);
+    }
+
+    .content { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
+
+    .track-header { margin-bottom: 24px; animation: fadeUp 0.3s ease both; }
+
+    .track-header-line {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .track-line-bar { width: 32px; height: 2px; }
+    .track-line-bar.pentest { background: linear-gradient(90deg, var(--pt-accent), transparent); }
+    .track-line-bar.soc { background: linear-gradient(90deg, var(--soc-accent), transparent); }
+
+    .track-label { font-size: 9px; letter-spacing: 0.25em; }
+    .track-label.pentest { color: var(--pt-accent); }
+    .track-label.soc { color: var(--soc-accent); }
+
+    .track-desc {
+      font-size: 11px;
+      color: rgba(200,210,225,0.6);
+      line-height: 1.7;
+      padding-left: 14px;
+      margin-bottom: 6px;
+    }
+    .track-desc.pentest { border-left: 2px solid var(--pt-border); }
+    .track-desc.soc { border-left: 2px solid var(--soc-border); }
+
+    .progress-bar { display: flex; gap: 4px; margin-top: 14px; }
+    .progress-dot {
+      flex: 1; height: 4px; border-radius: 2px;
+      background: rgba(255,255,255,0.1);
+      cursor: pointer;
+      transition: background 0.2s ease, box-shadow 0.2s ease;
+    }
+    .progress-dot.active-pentest { background: var(--pt-accent); box-shadow: 0 0 6px var(--pt-glow); }
+    .progress-dot.active-soc { background: var(--soc-accent); box-shadow: 0 0 6px var(--soc-glow); }
+
+    .progress-count { font-size: 9px; color: rgba(255,255,255,0.25); margin-top: 5px; letter-spacing: 0.1em; }
+
+    .step-card {
+      margin-bottom: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+      background: rgba(8,8,14,0.7);
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+    .step-card:hover { border-color: rgba(255,255,255,0.15); }
+    .step-card.open-pentest {
+      border-color: var(--pt-border);
+      background: linear-gradient(135deg, rgba(10,10,16,0.95) 0%, rgba(15,15,25,0.98) 100%);
+      box-shadow: 0 0 20px var(--pt-glow), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    .step-card.open-soc {
+      border-color: var(--soc-border);
+      background: linear-gradient(135deg, rgba(10,10,16,0.95) 0%, rgba(15,15,25,0.98) 100%);
+      box-shadow: 0 0 20px var(--soc-glow), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+    }
+
+    .step-phase { font-size: 10px; letter-spacing: 0.15em; opacity: 0.8; min-width: 70px; }
+    .step-phase.pentest { color: var(--pt-accent); }
+    .step-phase.soc { color: var(--soc-accent); }
+
+    .step-icon { font-size: 18px; min-width: 24px; }
+
+    .step-title-wrap { flex: 1; }
+    .step-title { font-size: 13px; color: #f0f0f0; letter-spacing: 0.05em; font-weight: bold; }
+    .step-time { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 2px; letter-spacing: 0.08em; }
+
+    .step-toggle { font-size: 16px; transition: transform 0.2s ease; }
+    .step-toggle.pentest { color: var(--pt-accent); }
+    .step-toggle.soc { color: var(--soc-accent); }
+    .step-toggle.rotated { transform: rotate(90deg); }
+
+    .step-body { padding: 0 20px 20px; display: none; animation: fadeUp 0.2s ease both; }
+    .step-body.visible { display: block; }
+
+    .step-divider { height: 1px; margin-bottom: 16px; }
+    .step-divider.pentest { background: linear-gradient(90deg, rgba(255,69,0,0.4), transparent); }
+    .step-divider.soc { background: linear-gradient(90deg, rgba(0,212,255,0.4), transparent); }
+
+    .section-label { font-size: 9px; letter-spacing: 0.2em; margin-bottom: 10px; }
+    .section-label.pentest { color: var(--pt-accent); }
+    .section-label.soc { color: var(--soc-accent); }
+
+    .task-list { margin-bottom: 16px; }
+    .task-item { display: flex; gap: 10px; margin-bottom: 7px; align-items: flex-start; }
+    .task-dot { font-size: 8px; margin-top: 4px; flex-shrink: 0; }
+    .task-dot.pentest { color: #ff6b35; }
+    .task-dot.soc { color: var(--soc-accent); }
+    .task-text { font-size: 11px; color: rgba(220,220,230,0.85); line-height: 1.6; letter-spacing: 0.02em; }
+
+    .resource-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .resource-tag {
+      font-size: 10px;
+      border-radius: 3px;
+      padding: 3px 8px;
+      letter-spacing: 0.04em;
+    }
+    .resource-tag.pentest { color: var(--pt-accent); background: var(--pt-tag); border: 1px solid var(--pt-border); }
+    .resource-tag.soc { color: var(--soc-accent); background: var(--soc-tag); border: 1px solid var(--soc-border); }
+
+    .tip-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 4px;
+      padding: 10px 14px;
+    }
+    .tip-box.pentest { border-left: 3px solid var(--pt-accent); }
+    .tip-box.soc { border-left: 3px solid var(--soc-accent); }
+
+    .tip-label { font-size: 9px; letter-spacing: 0.15em; margin-bottom: 5px; }
+    .tip-label.pentest { color: var(--pt-accent); }
+    .tip-label.soc { color: var(--soc-accent); }
+
+    .tip-text { font-size: 11px; color: rgba(200,210,220,0.75); line-height: 1.6; font-style: italic; }
+
+    .footer {
+      margin-top: 32px;
+      padding: 16px 20px;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 6px;
+      background: rgba(255,255,255,0.02);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .footer-left { font-size: 9px; color: rgba(255,255,255,0.25); letter-spacing: 0.15em; }
+    .footer-right { font-size: 9px; letter-spacing: 0.1em; }
+    .footer-right.pentest { color: var(--pt-accent); }
+    .footer-right.soc { color: var(--soc-accent); }
+  </style>
+</head>
+<body>
+
+<div class="scanline"></div>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-tag">HACK THE BOX ◈ ABSOLUTE BEGINNER ROADMAP ◈ 2026</div>
+    <div class="header-title pentest" id="mainTitle">
+      CHOOSE YOUR PATH<span class="cursor pentest" id="cursor"></span>
+    </div>
+    <div class="track-buttons">
+      <button class="track-btn active-pentest" id="btn-pentest" onclick="switchTrack('pentest')">⚔ PENETRATION TESTING</button>
+      <button class="track-btn" id="btn-soc" onclick="switchTrack('soc')">🛡 SOC ANALYST</button>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="track-header" id="trackHeader">
+    <div class="track-header-line">
+      <div class="track-line-bar pentest" id="trackBar"></div>
+      <span class="track-label pentest" id="trackLabel">RED TEAM OPERATIONS</span>
+    </div>
+    <div class="track-desc pentest" id="trackDesc"></div>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="progress-count" id="progressCount"></div>
+  </div>
+
+  <div id="stepsContainer"></div>
+
+  <div class="footer">
+    <div class="footer-left">ACADEMY.HACKTHEBOX.COM ◈ LABS.HACKTHEBOX.COM</div>
+    <div class="footer-right pentest" id="footerRight">HTB BEGINNER ROADMAP</div>
+  </div>
+</div>
+
+<script>
+const data = {
+  pentest: {
+    label: "RED TEAM OPERATIONS",
+    desc: "7-phase roadmap from zero to your first rooted machine and CPTS certification. Estimated timeline: 9–12 months with consistent weekly effort. No prior experience required.",
+    steps: [
+      {
+        phase: "PHASE 01", title: "Set Up Your Environment", icon: "⚙️", time: "Week 1",
+        tasks: [
+          "Create a free HTB Academy account at academy.hackthebox.com",
+          "Install Kali Linux in VirtualBox or VMware (or use HTB's browser-based Pwnbox — no install needed)",
+          "Connect to the HTB VPN — always confirm your connection with a ping before starting",
+          "Set up an organized notes folder: /notes, /scripts, /logs for each machine",
+          "Bookmark key references: GTFOBins, HackTricks, ExplainShell"
+        ],
+        resources: ["HTB Pwnbox (free, browser-based)", "VirtualBox (free)", "Kali Linux ISO (free)", "HTB VPN config"],
+        tip: "Don't overthink the setup. Pwnbox gets you hacking in under 5 minutes with no local install required — start there if you're unsure."
+      },
+      {
+        phase: "PHASE 02", title: "Learn the Absolute Foundations", icon: "📡", time: "Weeks 2–4",
+        tasks: [
+          "HTB Academy: Linux Fundamentals — filesystem, permissions, navigation, processes",
+          "HTB Academy: Intro to Networking — OSI model, TCP/IP, subnetting, common ports",
+          "HTB Academy: Web Requests — HTTP methods, headers, status codes, REST basics",
+          "HTB Academy: Intro to Bash Scripting — loops, conditionals, pipes",
+          "Challenge: spend one full week using only the Linux terminal, no GUI"
+        ],
+        resources: ["HTB Academy free modules", "OverTheWire: Bandit (free Linux wargame)", "ExplainShell.com", "Subnet Calculator"],
+        tip: "Linux and networking are the absolute bedrock. Rushing past this phase will slow you down later. Take your time here."
+      },
+      {
+        phase: "PHASE 03", title: "Learn the Hacker Methodology", icon: "🔍", time: "Weeks 5–8",
+        tasks: [
+          "HTB Academy: Penetration Testing Process — understand the full kill chain end to end",
+          "HTB Academy: Network Enumeration with Nmap — scanning, service detection, OS fingerprinting",
+          "HTB Academy: Footprinting — passive and active information gathering",
+          "HTB Academy: Information Gathering — Web Edition",
+          "Memorize the workflow: Recon → Scan → Exploit → Post-Exploit → Report — every time, no exceptions"
+        ],
+        resources: ["HTB Academy: Junior Penetration Tester path", "Nmap documentation", "Netcat cheat sheet", "HackTricks"],
+        tip: "Hacking is not random guessing — it is a structured process. Every machine has a way in. Your job is to be methodical enough to find it."
+      },
+      {
+        phase: "PHASE 04", title: "HTB Starting Point Machines", icon: "🎯", time: "Weeks 9–12",
+        tasks: [
+          "Complete HTB Starting Point Tier 0 — fully guided with step-by-step walkthroughs",
+          "Complete HTB Starting Point Tier 1 — semi-guided, some independence required",
+          "Complete HTB Starting Point Tier 2 — minimal hints, mostly on your own",
+          "Write notes after every single machine — what you tried, what worked, what didn't",
+          "Only look at official writeups AFTER you have attempted or completed the machine"
+        ],
+        resources: ["HTB Starting Point (free)", "IppSec YouTube channel", "0xdf.gitlab.io writeups"],
+        tip: "Tier 0 feels like hand-holding — that is intentional. It builds muscle memory and pattern recognition you will rely on for years."
+      },
+      {
+        phase: "PHASE 05", title: "Core Exploitation Skills", icon: "💥", time: "Months 4–5",
+        tasks: [
+          "HTB Academy: Using the Metasploit Framework — modules, payloads, sessions",
+          "HTB Academy: File Transfers — moving files between attacker and target",
+          "HTB Academy: Shells & Payloads — bind shells, reverse shells, web shells",
+          "HTB Academy: Password Attacks — hash cracking, credential stuffing, spraying",
+          "HTB Academy: Privilege Escalation — Linux and Windows both",
+          "Attempt your first 'Easy' rated machine on HTB Labs without a guide"
+        ],
+        resources: ["HTB Academy (Silver subscription recommended)", "GTFOBins", "PEASS-ng (LinPEAS / WinPEAS)", "CrackStation"],
+        tip: "Easy machines on HTB Labs are genuinely difficult for beginners. Getting stuck is normal — it means you are learning something real."
+      },
+      {
+        phase: "PHASE 06", title: "Web App & Active Directory", icon: "🕸️", time: "Months 6–8",
+        tasks: [
+          "HTB Academy: SQL Injection Fundamentals — manual and automated exploitation",
+          "HTB Academy: Cross-Site Scripting (XSS) — stored, reflected, DOM-based",
+          "HTB Academy: File Inclusion — LFI, RFI, log poisoning",
+          "HTB Academy: Active Directory Enumeration & Attacks — the core of real-world pentesting",
+          "PortSwigger Web Academy — free, world-class web hacking labs with guided labs",
+          "Complete 5–10 Easy HTB Labs machines across different categories"
+        ],
+        resources: ["PortSwigger Web Academy (free)", "HTB Academy AD modules", "BloodHound", "Impacket toolkit"],
+        tip: "Active Directory is where the majority of real enterprise penetration tests live. It is not optional — make it a priority."
+      },
+      {
+        phase: "PHASE 07", title: "Certification & Portfolio", icon: "🏆", time: "Months 9–12",
+        tasks: [
+          "Complete the HTB Penetration Tester Job Role Path — 28 modules covering the full lifecycle",
+          "Target the CPTS certification (HTB Certified Penetration Testing Specialist)",
+          "Build a public GitHub portfolio: machine writeups, custom scripts, tool notes",
+          "Aim for 20+ retired HTB Labs machines — document every single one",
+          "Write a full professional pentest report for a retired machine to practice reporting skills"
+        ],
+        resources: ["CPTS exam (10-day lab + 10-day report)", "GitHub (free)", "HTB Pro Labs (optional, advanced)"],
+        tip: "CPTS is a 10-day hands-on exam with a written report — it is one of the most respected entry-level pentest certifications available right now."
+      }
+    ]
+  },
+  soc: {
+    label: "BLUE TEAM OPERATIONS",
+    desc: "7-phase roadmap from zero to SOC Tier 1 analyst ready, targeting the CDSA certification. Covers monitoring, detection, incident response, and threat hunting. No prior experience required.",
+    steps: [
+      {
+        phase: "PHASE 01", title: "Build the Foundation", icon: "🧱", time: "Weeks 1–2",
+        tasks: [
+          "Create a free HTB Academy account at academy.hackthebox.com",
+          "Start the SOC Analyst Prerequisites path — free Tier 0 modules",
+          "HTB Academy: Linux Fundamentals — you will use Linux every day as a SOC analyst",
+          "HTB Academy: Windows Fundamentals — most enterprise environments are Windows-based",
+          "HTB Academy: Intro to Networking — understanding traffic is core to SOC work"
+        ],
+        resources: ["HTB Academy free tier", "Professor Messer (free CompTIA study videos)", "TryHackMe SOC Level 1 path (supplemental)"],
+        tip: "The SOC role is fundamentally about understanding normal so you can spot abnormal. That starts with solid networking and OS fundamentals."
+      },
+      {
+        phase: "PHASE 02", title: "Security Concepts & Tools", icon: "🛡️", time: "Weeks 3–6",
+        tasks: [
+          "HTB Academy: Introduction to Information Security — CIA triad, threat landscape, attack types",
+          "HTB Academy: Intro to Active Directory — most enterprise alerts involve AD",
+          "HTB Academy: Using Web Proxies — understand HTTP traffic at the packet level",
+          "HTB Academy: JavaScript Deobfuscation — analysts frequently encounter obfuscated malicious JS",
+          "Research the major SIEM platforms: Splunk, Elastic, Microsoft Sentinel, QRadar"
+        ],
+        resources: ["HTB Academy", "Splunk Fundamentals 1 (free training)", "SANS SOC resources", "MITRE ATT&CK (start reading)"],
+        tip: "A great SOC analyst understands how attackers think. You are learning offense concepts here so you can recognize them on defense."
+      },
+      {
+        phase: "PHASE 03", title: "Traffic & Log Analysis", icon: "📊", time: "Weeks 7–10",
+        tasks: [
+          "HTB Academy: Intro to Network Traffic Analysis — what normal traffic looks like vs. malicious",
+          "HTB Academy: Wireshark — The Basics & Packet Operations",
+          "HTB Academy: Working with IDS/IPS — Snort and Suricata rule logic",
+          "HTB Academy: Introduction to Threat Hunting & Hunting With Elastic",
+          "Download real PCAP files and practice identifying anomalies in Wireshark daily"
+        ],
+        resources: ["Wireshark (free)", "malware-traffic-analysis.net (free PCAPs)", "Zeek documentation", "HTB Academy"],
+        tip: "Log and packet analysis is a perishable skill — it gets better only through repetition. Make it a daily habit, even if only for 15 minutes."
+      },
+      {
+        phase: "PHASE 04", title: "SIEM & Detection Engineering", icon: "🔭", time: "Months 3–4",
+        tasks: [
+          "HTB Academy: Security Monitoring & SIEM Fundamentals",
+          "HTB Academy: Introduction to Splunk — search, dashboards, alerts",
+          "Set up a free Splunk instance or Elastic SIEM in a home lab environment",
+          "Ingest Windows Event Logs and write your first custom detection rule",
+          "HTB Academy: Understanding Log Sources & Investigating with Splunk"
+        ],
+        resources: ["Splunk Free (500MB/day limit)", "Elastic SIEM (free)", "Security Onion (free home lab distro)", "Windows Event Log reference"],
+        tip: "Security Onion bundles Elastic SIEM, Zeek, and Suricata into one free install — it is one of the best home lab tools available for SOC training."
+      },
+      {
+        phase: "PHASE 05", title: "Incident Response & DFIR", icon: "🚨", time: "Months 4–6",
+        tasks: [
+          "HTB Academy: Incident Handling Process — preparation, identification, containment, eradication, recovery",
+          "HTB Academy: Introduction to Digital Forensics — disk, memory, and artifact analysis",
+          "HTB Academy: Windows Event Logs & Finding Evil — event IDs that matter most",
+          "HTB Academy: Detecting Windows Attacks with Splunk",
+          "Start working through HTB Sherlocks — DFIR-focused blue team challenges based on real scenarios"
+        ],
+        resources: ["HTB Sherlocks (blue team challenges)", "CyberDefenders (free blue team labs)", "LetsDefend (free tier)", "Eric Zimmerman's forensic tools"],
+        tip: "HTB Sherlocks are scenario-based incident investigations — the closest thing to real SOC work you will find in a free training environment."
+      },
+      {
+        phase: "PHASE 06", title: "Threat Intel & Hunting", icon: "🧠", time: "Months 6–8",
+        tasks: [
+          "HTB Academy: YARA & Sigma Rules — writing detection signatures",
+          "HTB Academy: Introduction to Malware Analysis — static and dynamic analysis basics",
+          "HTB Academy: Intro to Threat Intelligence — IOCs, TTPs, threat actor profiling",
+          "Learn the MITRE ATT&CK framework deeply — map techniques to detection opportunities",
+          "Build a threat hunting playbook for at least one ATT&CK technique from scratch"
+        ],
+        resources: ["MITRE ATT&CK Navigator (free)", "VirusTotal (free tier)", "ANY.RUN sandbox (free tier)", "Sigma rules GitHub repo"],
+        tip: "MITRE ATT&CK is the shared language of the entire security industry. Interviewers, analysts, and vendors all speak it — learn it fluently."
+      },
+      {
+        phase: "PHASE 07", title: "Certification & Portfolio", icon: "🏆", time: "Months 9–12",
+        tasks: [
+          "Complete the HTB SOC Analyst Job Role Path — 15 modules covering the full analyst workflow",
+          "Target the CDSA certification (HTB Certified Defensive Security Analyst)",
+          "Complete 20+ HTB Sherlocks and document your findings publicly on GitHub",
+          "Build a portfolio: custom detection rules, IR playbooks, Splunk dashboards, writeups",
+          "Consider CompTIA CySA+ as a complementary certification — content overlaps heavily with CDSA"
+        ],
+        resources: ["CDSA exam (~$210)", "CompTIA CySA+ (strong overlap with CDSA prep)", "GitHub (free portfolio hosting)"],
+        tip: "CDSA paired with CySA+ is a strong entry-level certification combo that signals both hands-on ability and foundational knowledge to employers."
+      }
+    ]
+  }
+};
+
+let currentTrack = 'pentest';
+let openSteps = { pentest: new Set([0]), soc: new Set([0]) };
+
+function switchTrack(track) {
+  currentTrack = track;
+  render();
+}
+
+function toggleStep(index) {
+  const set = openSteps[currentTrack];
+  if (set.has(index)) { set.delete(index); } else { set.add(index); }
+  render();
+}
+
+function render() {
+  const t = currentTrack;
+  const track = data[t];
+
+  document.getElementById('mainTitle').className = `header-title ${t}`;
+  document.getElementById('cursor').className = `cursor ${t}`;
+  document.getElementById('btn-pentest').className = `track-btn${t === 'pentest' ? ' active-pentest' : ''}`;
+  document.getElementById('btn-soc').className = `track-btn${t === 'soc' ? ' active-soc' : ''}`;
+
+  document.getElementById('trackBar').className = `track-line-bar ${t}`;
+  document.getElementById('trackLabel').className = `track-label ${t}`;
+  document.getElementById('trackLabel').textContent = track.label;
+  document.getElementById('trackDesc').className = `track-desc ${t}`;
+  document.getElementById('trackDesc').textContent = track.desc;
+
+  const pb = document.getElementById('progressBar');
+  pb.innerHTML = '';
+  track.steps.forEach((_, i) => {
+    const dot = document.createElement('div');
+    const isOpen = openSteps[t].has(i);
+    dot.className = `progress-dot${isOpen ? ' active-' + t : ''}`;
+    dot.onclick = () => toggleStep(i);
+    pb.appendChild(dot);
+  });
+  document.getElementById('progressCount').textContent = `${openSteps[t].size} / ${track.steps.length} PHASES EXPANDED`;
+  document.getElementById('footerRight').className = `footer-right ${t}`;
+
+  const container = document.getElementById('stepsContainer');
+  container.innerHTML = '';
+  track.steps.forEach((step, i) => {
+    const isOpen = openSteps[t].has(i);
+    const card = document.createElement('div');
+    card.className = `step-card${isOpen ? ' open-' + t : ''}`;
+    card.onclick = () => toggleStep(i);
+
+    const tasksHTML = step.tasks.map(task =>
+      `<div class="task-item">
+        <span class="task-dot ${t}">◆</span>
+        <span class="task-text">${task}</span>
+      </div>`
+    ).join('');
+
+    const resourcesHTML = step.resources.map(r =>
+      `<span class="resource-tag ${t}">${r}</span>`
+    ).join('');
+
+    card.innerHTML = `
+      <div class="step-header">
+        <div class="step-phase ${t}">${step.phase}</div>
+        <span class="step-icon">${step.icon}</span>
+        <div class="step-title-wrap">
+          <div class="step-title">${step.title}</div>
+          <div class="step-time">${step.time}</div>
+        </div>
+        <div class="step-toggle ${t}${isOpen ? ' rotated' : ''}">›</div>
+      </div>
+      <div class="step-body${isOpen ? ' visible' : ''}">
+        <div class="step-divider ${t}"></div>
+        <div class="section-label ${t}">▸ OBJECTIVES</div>
+        <div class="task-list">${tasksHTML}</div>
+        <div class="section-label ${t}">▸ RESOURCES</div>
+        <div class="resource-list">${resourcesHTML}</div>
+        <div class="tip-box ${t}">
+          <div class="tip-label ${t}">◈ PRO TIP</div>
+          <div class="tip-text">${step.tip}</div>
+        </div>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+render();
+</script>
+</body>
+</html>
